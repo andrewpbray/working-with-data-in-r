@@ -1,0 +1,378 @@
+---
+title: "Working with Data in R"
+author: "Andrew Bray (from the CRAN tutorial)"
+date: "March 4, 2015"
+output:
+  ioslides_presentation:
+    incremental: true
+---
+
+##
+
+Most of this material can be found at:
+
+http://cran.rstudio.com/web/packages/dplyr/vignettes/introduction.html
+
+
+## Welcome to R
+
+> Whenever you're learning a new tool, for a long time you're going to suck ...
+> but the good news is that is typical, that's something that happens to everyone, 
+> and it's only temporary.
+
+-Hadley Wickham
+
+
+## Welcome to R
+
+- New users: go to `rstudio.mtholyoke.edu` and enter your campus login info.
+
+- Experienced users: either login to the server or bring up R/RStudio on your
+laptop.
+
+
+# Part I: Getting the data
+
+
+## What does a data set *look like*?
+
+- **Observations** down the rows
+- **Variables** across the columns
+- Flat file versus relational database.
+
+
+## Reading in data from a file
+
+Hosted online:
+
+```{r load_from_file, eval = FALSE}
+LAhomes <- read.csv("http://andrewpbray.github.io/data/LA.csv")
+```
+
+Hosted locally:
+```{r load_local, eval = FALSE}
+LAhomes <- read.csv("LA.csv")
+```
+
+Things to note:
+
+- The assign arrow is used to create **objects** in R, which are stored in your
+environment.
+- Object names don't have to correspond to file names.
+- Be sure R knows where to look for the file!
+
+
+## Viewing data - the viewer
+
+- `View()` can be used in RStudio to bring up an excel-style spreadsheet. Only
+for viewing, not editing!
+- The dimensions of the data can be found in the environment pane.
+- The names of the variables can be seen at the top of the viewer.
+
+
+## Viewing data - the console
+
+- `head()` can be used to print the first several lines of the dataset to the
+console.
+- `dim()` can be used to find the dimensions (rows then columns).
+- `names()` can be used to find the names of the variables.
+- DANGER ZONE : don't type the name of the data set at the console and hit enter! :
+DANGER ZONE
+
+
+## Your turn {.emphasized}
+
+There is a data set called `poverty.txt` in the same website directory as `LA.csv`.
+Please download that file to your machine (upload to the server) and read it in.
+
+Running in to problems? Ask your neighbor or try google!
+
+1. What are the dimensions of the data set?
+2. What appears to be the unit of observation?
+3. What are the variables?
+
+
+## 
+
+```{r eval = FALSE}
+poverty <- read.table("poverty.txt")
+dim(poverty)
+head(poverty)
+names(poverty)
+```
+
+
+## Reading in data from a package
+
+1. Download and install the package from CRAN (on a non-server version).
+    ```{r, eval = FALSE}
+    install.packages("nycflights13")
+    ```
+2. Load the package.
+    ```{r}
+    library(nycflights13)
+    ```
+3. Make the data set visible.
+    ```{r}
+    data(flights)
+    ```
+4. Get help.
+    ```{r eval = FALSE}
+    ?flights
+    ```
+
+
+# Part II: Slice and dice with dplyr
+
+
+## Why dplyr?
+
+Data sets are often of high *volume* (lots of rows) and high *variety* (lots
+of columns). This is overwhelming to visualize and analyze, so we find ourselves
+chopping the data set up into more manageable and meaningful chunks. We also 
+often need to perform operations to organize and clean our data.
+
+This is all possible in base R, but with `dplyr`, it is simple, readible, and
+fast.
+
+
+## The Seven Verbs
+
+- filter
+- arrange
+- select
+- distinct
+- mutate
+- summarise
+- sample_n
+
+
+## filter()
+
+Allows you to select a subset of the **rows** of a data frame. The first
+argument is the name of the data frame, the following arguments are the
+filters that you'd like to apply
+
+For all flights on January 1st:
+
+```{r message = FALSE, warning = FALSE}
+library(dplyr)
+filter(flights, month == 1, day == 1)
+```
+
+
+## Constructing filters
+
+Filters are constructed of **logical operators**: `<`, `>`, `<=`, `>=`, `==`,
+`!=` (and some others).
+
+Adding them one by one to `filter()` is akin to saying "this AND that". To say
+"this OR that OR both", use |.
+
+```{r}
+filter(flights, month == 1 | month == 2)
+```
+
+
+## Your turn
+
+Construct filters to isolate:
+
+1. Flights that left on St. Patrick's Day.
+2. Flights that were destined for Chicago's primary airport.
+3. Flights that were destined for Chicago's primary airport and were operated by
+United Airlines.
+4. Flights with flight times more than 2000 miles or that were in the air more
+than 5 hours.
+
+
+##
+
+1. Flights that left on St. Patrick's Day.
+2. Flights that were destined for Chicago's primary airport.
+3. Flights that were destined for Chicago's primary airport and were operated by
+United Airlines.
+4. Flights with flight times more than 2000 miles or that were in the air more
+than 5 hours.
+
+```{r eval = FALSE}
+filter(flights, month == 3, day == 17)
+filter(flights, dest == "ORD")
+filter(flights, dest == "ORD", carrier == "UA")
+filter(flights, distance > 2000 | air_time > 5*60)
+```
+
+
+## arrange()
+
+`arrange()` works similarly to `filter()` except that instead of filtering or 
+selecting rows, it reorders them. It takes a data frame, and a set of column 
+names (or more complicated expressions) to order by. If you provide more than 
+one column name, each additional column will be used to break ties in the values
+of preceding columns:
+
+```{r, eval = FALSE}
+arrange(flights, year, month, day)
+```
+
+Use `desc()` to sort in descending order.
+
+```{r, eval = FALSE}
+arrange(flights, desc(arr_delay))
+```
+
+
+## select()
+
+Often you work with large datasets with many columns where only a few are 
+actually of interest to you. `select()` allows you to rapidly zoom in on a useful
+subset using operations that usually only work on numeric variable positions:
+
+```{r eval=FALSE}
+select(flights, year, month, day)
+```
+
+You can exclude columns using `-` and specify a range using `:`.
+
+```{r eval = FALSE}
+select(flights, -(year:day))
+```
+
+
+## distinct()
+
+A common use of `select()` is to find out which values a set of variables takes. 
+This is particularly useful in conjunction with the `distinct()` verb which only 
+returns the unique values in a table.
+
+What do the following data correspond to?
+
+```{r}
+distinct(select(flights, origin, dest))
+```
+
+
+## mutate()
+
+As well as selecting from the set of existing columns, it's often useful to add 
+new columns that are functions of existing columns. This is the job of `mutate()`:
+
+```{r}
+mutate(flights, gain = arr_delay - dep_delay)
+```
+
+
+## summarise() and sample_n()
+
+`summarise()` collapses a data frame to a single row. It's not very useful yet. 
+`sample_n()` provides you with a random sample of the rows.
+
+```{r}
+summarise(flights, delay = mean(dep_delay, na.rm = TRUE))
+sample_n(flights, 10)
+```
+
+
+## Your turn
+
+**Mutate** the data into a new variable that contains the average speed traveled
+by the plane for each flight. **Select** that new variable and save it, along with
+tailnum, as a new dataframe object.
+
+
+## Your turn
+
+```{r}
+flights2 <- mutate(flights, speed = distance/(air_time/60))
+speed <- select(flights2, tailnum, speed)
+```
+
+
+## Aggregation aka group_by()
+
+These verbs become really powerful when you combine them with the idea of 
+"group by", repeating the operation individually on groups of observations 
+within the dataset. The `group_by()` function describes how to break a 
+dataset down into groups of rows.
+
+You can then use the resulting object in exactly the same functions as above;
+they'll automatically work "by group" when the input is a grouped.
+
+
+## group_by()
+
+We can find the fastest airplanes in the bunch:
+
+```{r}
+by_tailnum <- group_by(speed, tailnum)
+avg_speed <- summarise(by_tailnum, 
+                       count = n(), 
+                       avg_speed = mean(speed, na.rm = TRUE))
+arrange(avg_speed, desc(avg_speed))
+```
+
+
+## Chaining
+
+Instead of applying each verb step-by-step, we can chain them into a single
+data pipeline, connected with the `%>%` operator. You start the pipeline with
+a dataframe and then pass it to each function in turn.
+
+```{r}
+speed %>%
+  group_by(tailnum) %>% 
+  summarise(count = n(), avg_speed = mean(speed, na.rm = TRUE)) %>%
+  arrange(desc(avg_speed))
+```
+
+
+## Your turn
+
+Form a chain that creates a data frame containing only carrier and their
+mean departure delay time. Which carriers have the highest and lowest mean
+delays?
+
+
+## Your turn
+
+```{r}
+flights %>%
+  group_by(carrier) %>%
+  summarise(avg_delay = mean(dep_delay, na.rm = TRUE)) %>%
+  arrange(desc(avg_delay))
+```
+
+
+## Your turn again
+
+Say you're curious about the relationship between the number of flights each
+plane made in 2013, the mean distance that each of those planes flew, and the
+mean arrival delay. You also want to exclude the edge cases from your analysis,
+so focus on the planes that have logged more than 20 flights and flown an average
+distance of less than 2000 miles.
+
+
+## Your turn again
+
+```{r}
+delay <- flights %>%
+  group_by(tailnum) %>%
+  summarise(count = n(),
+            dist = mean(distance, na.rm = TRUE), 
+            delay = mean(arr_delay, na.rm = TRUE)) %>%
+  filter(count > 20, dist < 2000)
+```
+ 
+ 
+## Visualizing the data
+ 
+```{r eval = TRUE, message = FALSE, warning = FALSE, echo = FALSE}
+library(ggplot2)
+ggplot(delay, aes(dist, delay)) +
+ geom_point(aes(size = count), alpha = 1/2) +
+ geom_smooth() +
+ scale_size_area()
+```
+
+
+
