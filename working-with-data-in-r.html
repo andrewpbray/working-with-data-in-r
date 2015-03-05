@@ -372,16 +372,16 @@ filter(flights, distance &gt; 2000 | air_time &gt; 5*60)</pre>
 <pre >## Source: local data frame [10 x 16]
 ## 
 ##    year month day dep_time dep_delay arr_time arr_delay carrier tailnum
-## 1  2013     6   5     1840        40     2145         5      AA  N324AA
-## 2  2013     9   6     2032       -13     2139       -46      AA  N4XPAA
-## 3  2013     7  11      801         1     1018       -18      UA  N76508
-## 4  2013     9  15     1621         6     1749         2      B6  N296JB
-## 5  2013     5   1      720        -7      907       -18      EV  N12922
-## 6  2013    10   2     1124        -6     1325       -13      EV  N12569
-## 7  2013     6  11     1253        -7     1402       -12      US  N723UW
-## 8  2013     4   7     1105       -10     1209       -15      B6  N294JB
-## 9  2013     4  27     1520       -10     1816       -15      DL  N378NW
-## 10 2013    11  16     2044        -1     2325       -19      UA  N73276
+## 1  2013    10  29      808        -7     1050       -33      B6  N373JB
+## 2  2013    12   8     1808        39     2140        71      UA  N48127
+## 3  2013    12  29      838        -4     1138        -3      B6  N509JB
+## 4  2013    10  24     1003         3     1300        -6      UA  N79279
+## 5  2013     3  30     1103       -12     1428         3      AA  N3JMAA
+## 6  2013    12  22     2322       156      235       157      B6  N652JB
+## 7  2013     1  14     2219        20     2313         7      EV  N13992
+## 8  2013     6   7       NA        NA       NA        NA      MQ  N711MQ
+## 9  2013     4   3      602        -3      733        -2      MQ  N738MQ
+## 10 2013     5   7      746        -9      922       -43      9E  N916XJ
 ## Variables not shown: flight (int), origin (chr), dest (chr), air_time
 ##   (dbl), distance (dbl), hour (dbl), minute (dbl)</pre>
 
@@ -482,7 +482,7 @@ arrange(avg_speed, desc(avg_speed))</pre>
 
 </article></slide><slide class=''><hgroup><h2>Your turn again</h2></hgroup><article  id="your-turn-again">
 
-<p>Say you&#39;re curious about the relationship between the number of flights each plane made in 2013, the mean distance that each of those planes flew, and the mean arrival delay. You also want to exclude the edge cases from your analysis, so focus on the planes that have logged more than 20 flights and flown an average distance of less than 2000 miles.</p>
+<p>Say you&#39;re curious about the relationship between the number of flights each plane made in 2013, the mean distance that each of those planes flew, and the mean arrival delay. You also want to exclude the edge cases from your analysis, so focus on the planes that have logged more than 20 flights and flown an average distance of less than 2000 miles. Please form the chain that creates this dataset.</p>
 
 </article></slide><slide class=''><hgroup><h2>Your turn again</h2></hgroup><article  id="your-turn-again-1">
 

@@ -349,7 +349,7 @@ Say you're curious about the relationship between the number of flights each
 plane made in 2013, the mean distance that each of those planes flew, and the
 mean arrival delay. You also want to exclude the edge cases from your analysis,
 so focus on the planes that have logged more than 20 flights and flown an average
-distance of less than 2000 miles.
+distance of less than 2000 miles. Please form the chain that creates this dataset.
 
 
 ## Your turn again
